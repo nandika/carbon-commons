@@ -115,49 +115,50 @@ public class WSDL2FormGenerator {
 
                     // This is a fix for Mashup-861. If the transport is disabled we redirect the user to
                     // the alternative transport
-                    if (!axisService.isEnableAllTransports() &&
-                            !axisService.isExposedTransport(url.getProtocol())) {
-                        String redirectURL;
-                        if (ServerConstants.HTTP_TRANSPORT.equals(url.getProtocol()) &&
-                                axisService.isExposedTransport(ServerConstants.HTTPS_TRANSPORT)) {
-                            TransportInDescription httpsTransport = configCtx.getAxisConfiguration()
-                                    .getTransportIn(ServerConstants.HTTPS_TRANSPORT);
-                            Parameter parameter = httpsTransport.getParameter("proxyPort");
-                            String port = "";
-                            if (parameter != null && !"-1".equals(parameter.getValue())) {
-                                String value = (String) parameter.getValue();
-                                if (!"443".equals(value)) {
-                                    port = value;
-                                }
-                            } else {
-                                port = Integer.toString(CarbonUtils.getTransportPort(configCtx,
-                                        ServerConstants.HTTPS_TRANSPORT));
-                            }
-                            redirectURL =
-                                    ServerConstants.HTTPS_TRANSPORT + "://" + url.getHost() + ":" +
-                                            port + url.getPath() + "?" + url.getQuery();
-                            return redirectURL;
-                        } else if (ServerConstants.HTTPS_TRANSPORT.equals(url.getProtocol()) &&
-                                axisService.isExposedTransport(ServerConstants.HTTP_TRANSPORT)) {
-                            TransportInDescription httpsTransport = configCtx.getAxisConfiguration()
-                                    .getTransportIn(ServerConstants.HTTP_TRANSPORT);
-                            Parameter parameter = httpsTransport.getParameter("proxyPort");
-                            String port = "";
-                            if (parameter != null && !"-1".equals(parameter.getValue())) {
-                                String value = (String) parameter.getValue();
-                                if (!"80".equals(value)) {
-                                    port = value;
-                                }
-                            } else {
-                                port = Integer.toString(CarbonUtils.getTransportPort(configCtx,
-                                        ServerConstants.HTTP_TRANSPORT));
-                            }
-                            redirectURL =
-                                    ServerConstants.HTTP_TRANSPORT + "://" + url.getHost() + ":" +
-                                            port + url.getPath() + "?" + url.getQuery();
-                            return redirectURL;
-                        }
-                    }
+		    // commenting this since it causes a tryit failure with EI 
+//                    if (!axisService.isEnableAllTransports() &&
+//                            !axisService.isExposedTransport(url.getProtocol())) {
+//                        String redirectURL;
+//                        if (ServerConstants.HTTP_TRANSPORT.equals(url.getProtocol()) &&
+//                                axisService.isExposedTransport(ServerConstants.HTTPS_TRANSPORT)) {
+//                            TransportInDescription httpsTransport = configCtx.getAxisConfiguration()
+//                                    .getTransportIn(ServerConstants.HTTPS_TRANSPORT);
+//                            Parameter parameter = httpsTransport.getParameter("proxyPort");
+//                            String port = "";
+//                            if (parameter != null && !"-1".equals(parameter.getValue())) {
+//                                String value = (String) parameter.getValue();
+//                                if (!"443".equals(value)) {
+//                                    port = value;
+//                                }
+//                            } else {
+//                                port = Integer.toString(CarbonUtils.getTransportPort(configCtx,
+//                                        ServerConstants.HTTPS_TRANSPORT));
+//                            }
+//                            redirectURL =
+//                                    ServerConstants.HTTPS_TRANSPORT + "://" + url.getHost() + ":" +
+//                                            port + url.getPath() + "?" + url.getQuery();
+//                            return redirectURL;
+//                        } else if (ServerConstants.HTTPS_TRANSPORT.equals(url.getProtocol()) &&
+//                                axisService.isExposedTransport(ServerConstants.HTTP_TRANSPORT)) {
+//                            TransportInDescription httpsTransport = configCtx.getAxisConfiguration()
+//                                    .getTransportIn(ServerConstants.HTTP_TRANSPORT);
+//                            Parameter parameter = httpsTransport.getParameter("proxyPort");
+//                            String port = "";
+//                            if (parameter != null && !"-1".equals(parameter.getValue())) {
+//                                String value = (String) parameter.getValue();
+//                                if (!"80".equals(value)) {
+//                                    port = value;
+//                                }
+//                            } else {
+//                                port = Integer.toString(CarbonUtils.getTransportPort(configCtx,
+//                                        ServerConstants.HTTP_TRANSPORT));
+//                            }
+//                            redirectURL =
+//                                    ServerConstants.HTTP_TRANSPORT + "://" + url.getHost() + ":" +
+//                                            port + url.getPath() + "?" + url.getQuery();
+//                            return redirectURL;
+//                        }
+//                    }
 
                     Map<String, String> paramMap = new HashMap<String, String>();
                     DOMSource xmlSource = Util.getSigStream(axisService, null);
@@ -169,8 +170,6 @@ public class WSDL2FormGenerator {
                     }
 
                     String proxyContextPath = CarbonUtils.getProxyContextPath(false);
-                    paramMap.put("js-csrf-protection", 
-                            proxyContextPath + multitenantPrefix + "carbon/admin/js/csrfPrevention.js");
                     paramMap.put("js-global-params", proxyContextPath + multitenantPrefix + "carbon/global-params.js");
                     paramMap.put("proxyAddress",
                             proxyContextPath + contextRoot + "carbon/admin/jsp/WSRequestXSSproxy_ajaxprocessor.jsp");
@@ -605,7 +604,6 @@ public class WSDL2FormGenerator {
         OutputStream tryItOutFileStream = new FileOutputStream(tryItOutFile);
         Result tryItResult = new StreamResult(tryItOutFileStream);
 
-        paramMap.put("js-csrf-protection", "carbon/admin/js/csrfPrevention.js");
         paramMap.put("js-global-params", "carbon/global-params.js");
         paramMap.put("proxyAddress", "carbon/admin/jsp/WSRequestXSSproxy_ajaxprocessor.jsp");
         paramMap.put("js-service-stub", "filedownload?id=" + jsFileLocation.getUuid());
